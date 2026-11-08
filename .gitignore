@@ -1,0 +1,55 @@
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.VC.db
+*.VC.opendb
+*.opensdf
+*.sdf
+*.ipch
+
+# Build & Compilation Outputs
+bin/
+obj/
+x64/
+x86/
+Debug/
+Release/
+TestResults/
+*.obj
+*.ilk
+*.pdb
+*.tlog
+*.lastbuildstate
+*.log
+*.idb
+*.iobj
+*.ipdb
+*.res
+*.pch
+
+# Python Bytecode & Environments
+__pycache__/
+.pytest_cache/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Environment Configurations
+.env
+.env.*
+!.env.example
+
+# Operating System Files
+.DS_Store
+Thumbs.db
+desktop.ini
