@@ -65,7 +65,15 @@ def subtract_rows(matrix, target_row, source_row, multiplier):
 
 def forward_elimination(matrix):
     n = len(matrix)
+    if n == 0 or any(len(row) != n + 1 for row in matrix):
+        raise ValueError("Expected a non-empty n by (n + 1) augmented matrix")
     for i in range(n):
+        pivot_row = max(range(i, n), key=lambda row: abs(matrix[row][i]))
+        if matrix[pivot_row][i] == 0:
+            raise ValueError("The system has no unique solution")
+        if pivot_row != i:
+            print(f"Міняємо місцями рядки {i + 1} і {pivot_row + 1}")
+            matrix[i], matrix[pivot_row] = matrix[pivot_row], matrix[i]
         diagonal_element = matrix[i][i]
         print(f"Нормалізуємо рядок {i + 1}, ділимо на діагональний елемент: {diagonal_element:.5f}")
         matrix[i] = divide_row(matrix, i, diagonal_element)
@@ -103,7 +111,8 @@ def calculate_absolute_errors(matrix, solutions, variables):
 
 def gauss_method(matrix):
     print("=== Метод Гауса ===")
-    variables = sp.symbols(f"x1 x2 x3 x4 x5") 
+    original = [row[:] for row in matrix]
+    variables = sp.symbols(f"x1:{len(matrix) + 1}")
     print_equations(matrix, variables)
 
     print("=== Прямий хід ===")
@@ -111,9 +120,16 @@ def gauss_method(matrix):
     print("\n=== Зворотній хід ===")
     solutions = backward_substitution(matrix, variables)
     
-    calculate_absolute_errors(matrix, solutions, variables)
+    calculate_absolute_errors(original, solutions, variables)
 
     return solutions
+
+
+def gauss_jordan_method(matrix):
+    """Reduce an augmented matrix in place using partial row pivoting."""
+    forward_elimination(matrix)
+    backward_elimination(matrix)
+    return matrix
 
 A = [
     [-1, 22, 18, 22, 15, -8],
@@ -123,42 +139,48 @@ A = [
     [-7, 14, 17, -6, -9, 8]
 ]
 
-while True:
-    clear_screen()
+def main():
+    while True:
+        clear_screen()
+        print("=" * 40)
+        print("Група: ОІ-23")
+        print("Виконав: Гончаров Вадим Олегович")
+        print("Номер ЛР: №1")
+        print("Варіант: №4")
+        print("=" * 40)
+        print("Оберіть метод розв'язання:")
+        print("1 - Метод Гауса")
+        print("2 - Метод Гауса-Жордана")
+        choice = input("Ваш вибір (1 або 2): ")
+
+        if choice in ['1', '2']:
+            if choice == '1':
+                result = gauss_method([row[:] for row in A])
+            elif choice == '2':
+                result = gauss_jordan_method([row[:] for row in A])
+
+                print("\nКінцевий вигляд розширеної матриці:")
+                print_matrix(result)
+
+                solutions = [row[-1] for row in result]
+                for i, sol in enumerate(solutions):
+                    print(f"x{i + 1} = {sol:.5f}")
+
+                variables = sp.symbols(f"x1:{len(A) + 1}")
+                calculate_absolute_errors(A, dict(zip(variables, solutions)), variables)
+
+            break
+        else:
+            print("Будь ласка, введіть 1 або 2.")
+            input("Натисніть Enter, щоб спробувати ще раз...")
+
     print("=" * 40)
     print("Група: ОІ-23")
     print("Виконав: Гончаров Вадим Олегович")
     print("Номер ЛР: №1")
     print("Варіант: №4")
     print("=" * 40)
-    print("Оберіть метод розв'язання:")
-    print("1 - Метод Гауса")
-    print("2 - Метод Гауса-Жордана")
-    choice = input("Ваш вибір (1 або 2): ")
 
-    if choice in ['1', '2']:
-        if choice == '1':
-            result = gauss_method(A)
-        elif choice == '2':
-            result = gauss_jordan_method(A)
 
-            print("\nКінцевий вигляд розширеної матриці:")
-            print_matrix(result)
-
-            solutions = [row[-1] for row in result]
-            for i, sol in enumerate(solutions):
-                print(f"x{i + 1} = {sol:.5f}")
-
-            calculate_absolute_errors(A, {f"x{i + 1}": sol for i, sol in enumerate(solutions)}, sp.symbols(f"x1 x2 x3 x4 x5"))
-
-        break
-    else:
-        print("Будь ласка, введіть 1 або 2.")
-        input("Натисніть Enter, щоб спробувати ще раз...")
-
-print("=" * 40)
-print("Група: ОІ-23")
-print("Виконав: Гончаров Вадим Олегович")
-print("Номер ЛР: №1")
-print("Варіант: №4")
-print("=" * 40)
+if __name__ == "__main__":
+    main()
